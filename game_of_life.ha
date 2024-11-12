@@ -6,9 +6,12 @@ use strings;
 use math::random;
 use time;
 
-def SIZE: u32= 32;
+def SIZE: u32= 64;
 def X: size = SIZE*2;
 def Y: size = SIZE;
+def INITIAL_LIVE: size = SIZE/2;
+
+def DT: time::duration = 125:time::duration * time::MILLISECOND;
 
 def CLEAR_SCREEN: str = "\x1b[2J";     
 def CURSOR_HOME: str = "\x1b[H";       
@@ -24,12 +27,7 @@ fn next_generation(board: *[Y][X]int) void = {
 					if(dx == 0 && dy == 0) {
 						continue;
 					};
-					if(((y+dy>=0)&&
-						(y+dy)<Y:int)&&
-						((x+dx>=0)&&
-						(x+dx<X:int))) {
-						alive_neighbors[y][x] += board[y+dy][x+dx];
-					};
+					alive_neighbors[y][x] += board[emod(y+dy,Y:int)][emod(x+dx,X:int)];
 				};
 			};
 		};
@@ -52,9 +50,7 @@ fn next_generation(board: *[Y][X]int) void = {
 
 				board[y][x] = 0i;
 			}
-			else {
-				board[y][x] = board[y][x];
-			};
+			else board[y][x] = board[y][x];
 		};
 	};
 };
@@ -83,8 +79,8 @@ fn show_board(board: [Y][X]int) void = {
 	fmt::println()!;
 };
 
-fn modify(board: [Y][X]int) void = {
-	board[0][0] = 1;
+fn emod(a: int, b: int) int = {
+	return (a%b +b)%b;
 };
 
 export fn main() void = {
@@ -97,11 +93,10 @@ export fn main() void = {
 
 	fmt::printf("seed: {}\n",seed)!;
 	let rand = random::init(seed);
-	let starting_alive = SIZE/2; 
 	// populate up to 10 other random clumps of 3 cells
-	for(let i = 0z; i < starting_alive; i += 1) {
-		let randx = random::u32n(&rand,SIZE);
-		let randy = random::u32n(&rand,SIZE);
+	for(let i = 0z; i < INITIAL_LIVE; i += 1) {
+		let randx = random::u32n(&rand,X/2:u32);
+		let randy = random::u32n(&rand,Y/2:u32);
 		board[randy][randx] = 1;
 
 		// randomly determine the other 2 random life cells
@@ -123,31 +118,18 @@ export fn main() void = {
 			dx = -1;
 		};
 		
-		// out of bounds check
-		if(randx:int + dx > SIZE:int-1 || randx:int + dx < 0) {
-			fmt::printf("true\n")!;
-			dx *= -1;
-		};
-		board[randy][randx:int +dx] = 1;
+		board[randy][emod(randx:int +dx,X:int)] = 1;
+		board[randy][emod(randx:int +(2*dx),X:int)] = 1;
 
-		if(randy:int + dy > SIZE:int-1 || randy:int + dy < 0) {
-			fmt::printf("true\n")!;
-			dy *= -1;
-		};
-		board[randy:int + dy:int][randx] = 1;
+		board[emod(randy:int + dy,Y:int)][randx] = 1;
+		board[emod(randy:int + (2*dy),Y:int)][randx] = 1;
 	};
-
-
 
 	show_board(board);
 
 	for(true){
 		next_generation(&board);
 		show_board(board);
-		time::sleep(250:time::duration * time::MILLISECOND);
+		time::sleep(DT);
 	};
-
-	
-	//begin generations;
-	
 };
