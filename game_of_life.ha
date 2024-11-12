@@ -11,7 +11,7 @@ def X: size = SIZE*2;
 def Y: size = SIZE;
 def INITIAL_LIVE: size = SIZE/2;
 
-def DT: time::duration = 125:time::duration * time::MILLISECOND;
+def DT: time::duration = 100:time::duration * time::MILLISECOND;
 
 def CLEAR_SCREEN: str = "\x1b[2J";     
 def CURSOR_HOME: str = "\x1b[H";       
@@ -95,8 +95,8 @@ export fn main() void = {
 	let rand = random::init(seed);
 	// populate up to 10 other random clumps of 3 cells
 	for(let i = 0z; i < INITIAL_LIVE; i += 1) {
-		let randx = random::u32n(&rand,X/2:u32);
-		let randy = random::u32n(&rand,Y/2:u32);
+		let randx = random::u32n(&rand,X:u32);
+		let randy = random::u32n(&rand,Y:u32);
 		board[randy][randx] = 1;
 
 		// randomly determine the other 2 random life cells
@@ -117,12 +117,15 @@ export fn main() void = {
 		} else {
 			dx = -1;
 		};
+		//random "arm" length for 'x' and 'y' directions
+		let arm_x = random::u32n(&rand,11):int;
+		for (let ax = 0i;ax < arm_x; ax += 1) 
+			board[randy][emod(randx:int +(ax*dx),X:int)] = 1;
 		
-		board[randy][emod(randx:int +dx,X:int)] = 1;
-		board[randy][emod(randx:int +(2*dx),X:int)] = 1;
+		let arm_y = random::u32n(&rand,11):int;
+		for (let ay = 0i;ay < arm_y; ay += 1) 
+			board[emod(randy:int+(ay*dy),Y:int)][randx] = 1;
 
-		board[emod(randy:int + dy,Y:int)][randx] = 1;
-		board[emod(randy:int + (2*dy),Y:int)][randx] = 1;
 	};
 
 	show_board(board);
