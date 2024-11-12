@@ -25,5 +25,10 @@ hare run
 <img src="./assets/ex.gif" alt="Example run"/>
 
 ## TODO
-- [ ] Make initial condition better to have longer runs of changes
+- [x] Make initial condition better to have longer runs of changes
 - [ ] Allow for option to manually select cells to start with
+
+## References
+
+- https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+- https://github.com/tsoding/SmoothLife/blob/master/smoothlife_term.c#L88 (for `emod`)
