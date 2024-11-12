@@ -6,8 +6,8 @@ use strings;
 use math::random;
 use time;
 
-def SIZE: u32= 64;
-def X: size = SIZE*2;
+def SIZE: u32= 128;
+def X: size = SIZE;
 def Y: size = SIZE;
 def INITIAL_LIVE: size = SIZE/2;
 
@@ -58,7 +58,7 @@ fn next_generation(board: *[Y][X]int) void = {
 fn show_board(board: [Y][X]int) void = {
 	fmt::printf(CLEAR_SCREEN)!;
 	fmt::printf(CURSOR_HOME)!;
-	for(let x =0z;x<X+2;x+=1) {
+	for(let x =0z;x<(X * 2)+2;x+=1) {
 		fmt::printf("-")!;
 	};
 	fmt::println()!;
@@ -66,14 +66,14 @@ fn show_board(board: [Y][X]int) void = {
 		fmt::printf("|")!;
 		for(let x = 0z;x<X;x+=1) {
 			if (board[y][x] == 0) { 
-				fmt::printf(" ")!; 
+				fmt::printf("  ")!; 
 			} else {
-				fmt::printf("█")!;
+				fmt::printf("██")!;
 			};
 		};
 		fmt::printf("|\n")!;
 	};
-	for(let x =0z;x<X+2;x+=1) {
+	for(let x =0z;x<(X * 2)+2;x+=1) {
 		fmt::printf("-")!;
 	};
 	fmt::println()!;
@@ -118,11 +118,11 @@ export fn main() void = {
 			dx = -1;
 		};
 		//random "arm" length for 'x' and 'y' directions
-		let arm_x = random::u32n(&rand,11):int;
+		let arm_x = random::u32n(&rand,SIZE/8):int;
 		for (let ax = 0i;ax < arm_x; ax += 1) 
 			board[randy][emod(randx:int +(ax*dx),X:int)] = 1;
 		
-		let arm_y = random::u32n(&rand,11):int;
+		let arm_y = random::u32n(&rand,SIZE/8):int;
 		for (let ay = 0i;ay < arm_y; ay += 1) 
 			board[emod(randy:int+(ay*dy),Y:int)][randx] = 1;
 
